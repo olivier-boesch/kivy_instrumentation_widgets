@@ -103,7 +103,7 @@ class TestApp(App):
         root.add_widget(self.timer)
 
         # Boutons de contrôle
-        controls = BoxLayout(size_hint=(1, 0.3), spacing=10)
+        controls = BoxLayout(size_hint=(1, None), spacing=10, height='50dp')
         btn_start = FlatButton(text="Start (1 min)", on_press=lambda x: self.timer.start(timedelta(minutes=1)))
         btn_resume = FlatButton(text="Resume", on_press=lambda x: self.timer.start())
         btn_pause = FlatButton(text="Pause", on_press=lambda x: self.timer.pause())
