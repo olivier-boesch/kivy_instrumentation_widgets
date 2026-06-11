@@ -22,21 +22,21 @@ Palette de couleurs :
 
 ## Composants principaux
 
-- **`FlatButton`, `FlatToggleButton`** (`flatbutton.py`)
+- **`FlatButton`, `FlatToggleButton`** (`src/flatbutton.py`)
   - Boutons plats avec effet de surbrillance et support de groupes de basculement.
-- **`BorderWrapper`** (`borderwrapper.py`)
+- **`BorderWrapper`** (`src/borderwrapper.py`)
   - Conteneur avec bordure arrondie et titre intégré pour structurer les panneaux de contrôle.
-- **`CircularGauge`** (`jauge.py`)
+- **`CircularGauge`** (`src/jauge.py`)
   - Jauge circulaire animée avec affichage de la valeur, de l'unité et d'une moyenne mobile.
-- **`RollingChart`** (`rollingchart.py`)
+- **`RollingChart`** (`src/rollingchart.py`)
   - Graphique en courbe à fenêtre glissante avec auto-échelle verticale et axes unitaires.
-- **`CircularTimer`** (`timer.py`)
+- **`CircularTimer`** (`src/timer.py`)
   - Timer visuel animé montrant le temps restant sous forme d'arc circulaire.
-- **`ValidationWidget`** (`validationwidget.py`)
+- **`ValidationWidget`** (`src/validationwidget.py`)
   - Contrôle de validation par glissement et action circulaire activable.
-- **`UnitNumberPopup`** (`valuepopup.py`)
+- **`UnitNumberPopup`** (`src/valuepopup.py`)
   - Popup numérique avec sélection de préfixes SI et d'unités compatibles via Pint.
-- **`RotaryEncoderWidget`** (`encoder.py`)
+- **`RotaryEncoderWidget`** (`src/encoder.py`)
   - Encodeur rotatif interactif pour l'ajustement fin de valeurs et l'affichage d'une unité.
 
 ## Dependencies
@@ -52,13 +52,13 @@ Le dépôt contient également un sous-dossier `pint-master/` pour la gestion lo
 Chaque module principal peut être démarré directement pour visualiser son application de test :
 
 ```bash
-.venv/bin/python flatbutton.py
-.venv/bin/python jauge.py
-.venv/bin/python rollingchart.py
-.venv/bin/python timer.py
-.venv/bin/python validationwidget.py
-.venv/bin/python valuepopup.py
-.venv/bin/python encoder.py
+.venv/bin/python src/flatbutton.py
+.venv/bin/python src/jauge.py
+.venv/bin/python src/rollingchart.py
+.venv/bin/python src/timer.py
+.venv/bin/python src/validationwidget.py
+.venv/bin/python src/valuepopup.py
+.venv/bin/python src/encoder.py
 ```
 
 ## Captures d'écran
@@ -86,14 +86,25 @@ Les captures d'écran de démonstration sont générées dans le dossier `screen
 Un script d'aide est disponible pour recréer les images automatiquement :
 
 ```bash
-.venv/bin/python generate_screenshots.py <module>.py screenshots/<name>.png
+.venv/bin/python src/generate_screenshots.py src/<module>.py screenshots/<name>.png
 ```
 
 Par exemple :
 
 ```bash
-.venv/bin/python generate_screenshots.py flatbutton.py screenshots/flatbutton.png
+.venv/bin/python src/generate_screenshots.py src/flatbutton.py screenshots/flatbutton.png
 ```
+
+## Tests
+
+La suite de tests (unitaires et de performance) couvre tous les widgets et s'exécute avec pytest :
+
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest
+```
+
+Une intégration continue GitHub Actions (`.github/workflows/ci.yml`) exécute cette suite à chaque push et pull request.
 
 ## Objectif du projet
 
