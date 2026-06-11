@@ -1,4 +1,35 @@
+# Projet
 /.venv
 /__pycache__
 /pint-master
 /pint-master.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Tests et couverture
+.pytest_cache/
+.cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Kivy
+.kivy/
+
+# Outils / éditeurs
+.mypy_cache/
+.ruff_cache/
+*.log
