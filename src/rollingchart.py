@@ -1,27 +1,23 @@
-import ast
-if not hasattr(ast, 'Str'):
-    ast.Str = ast.Constant
-    ast.Num = ast.Constant
-    ast.Bytes = ast.Constant
-    ast.NameConstant = ast.Constant
-    ast.Constant.s = property(lambda self: self.value if isinstance(self.value, (str, bytes)) else '')
-    ast.Constant.n = property(lambda self: self.value if isinstance(self.value, (int, float, complex)) else 0)
+import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 __all__ = ['RollingChart']
 
 import collections
 
-import pint
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.properties import NumericProperty, ListProperty
 from kivy.graphics import Color, Line, Rectangle
-from kivy.core.text import Label as CoreLabel
 from kivy.metrics import dp
 
-ureg = pint.UnitRegistry()
+from units import ureg
+from theme import ACCENT, WHITE, BLACK
+from _canvas_utils import make_texture
 
 _N_Y_TICKS = 5
 _N_X_TICKS = 3
+
+_TICK_LABEL_COLOR = [0.80, 0.80, 0.80, 1]
+_UNIT_LABEL_COLOR = [0.70, 0.70, 0.70, 1]
 
 
 class RollingChart(RelativeLayout):
@@ -40,7 +36,7 @@ class RollingChart(RelativeLayout):
         chart.push(12.4 * ureg.watt)
     """
 
-    line_color = ListProperty([0.2, 0.6, 0.8, 1])
+    line_color = ListProperty(ACCENT)
     x_window   = NumericProperty(60)
 
     def __init__(self, y_unit, x_window=60, x_step=None, **kwargs):
@@ -82,13 +78,13 @@ class RollingChart(RelativeLayout):
         self._pts = [0.0] * (2 * x_window)
 
         with self.canvas.before:
-            Color(0,0,0, 1)
+            Color(*BLACK)
             self._bg = Rectangle()
-            Color(0.2, 0.6, 0.8, 1)
+            Color(*ACCENT)
             self._grid_lines = []
             for _ in range(_N_Y_TICKS):
                 self._grid_lines.append(Line())
-            Color(0.2, 0.6, 0.8, 1)
+            Color(*ACCENT)
             self._axes = Line()
 
         with self.canvas:
@@ -100,17 +96,17 @@ class RollingChart(RelativeLayout):
             # par le CoreLabel uniquement (sinon double atténuation)
             self._ytick_rects = []
             for _ in range(_N_Y_TICKS):
-                Color(1, 1, 1, 1)
+                Color(*WHITE)
                 self._ytick_rects.append(Rectangle(size=(0, 0)))
 
             self._xtick_rects = []
             for _ in range(_N_X_TICKS):
-                Color(1, 1, 1, 1)
+                Color(*WHITE)
                 self._xtick_rects.append(Rectangle(size=(0, 0)))
 
-            Color(1, 1, 1, 1)
+            Color(*WHITE)
             self._yunit_rect = Rectangle(size=(0, 0))
-            Color(1, 1, 1, 1)
+            Color(*WHITE)
             self._xunit_rect = Rectangle(size=(0, 0))
 
         self.bind(
@@ -219,10 +215,7 @@ class RollingChart(RelativeLayout):
             frac = j / (_N_Y_TICKS - 1)
             val  = y_min + frac * y_rng
             ty   = y0 + frac * ph
-            lbl  = CoreLabel(text=f"{val:.2g}", font_size=fs,
-                             color=[0.80, 0.80, 0.80, 1])
-            lbl.refresh()
-            tx           = lbl.texture
+            tx   = make_texture(f"{val:.2g}", fs, _TICK_LABEL_COLOR)
             rect.texture = tx
             rect.size    = tx.size
             rect.pos     = (wx + x0 - tx.width - d4, wy + ty - tx.height / 2)
@@ -240,10 +233,7 @@ class RollingChart(RelativeLayout):
             sample_offset = int(frac * (n - 1)) - (n - 1)   # -(n-1) … 0
             val           = sample_offset * self._x_step_mag
             text          = f"{val:.0f}" if self._x_unit_str else str(sample_offset)
-            lbl  = CoreLabel(text=text, font_size=fs,
-                             color=[0.80, 0.80, 0.80, 1])
-            lbl.refresh()
-            tx           = lbl.texture
+            tx   = make_texture(text, fs, _TICK_LABEL_COLOR)
             rect.texture = tx
             rect.size    = tx.size
             rect.pos     = (wx + px - tx.width / 2, wy + self._mb / 2 - tx.height / 2)
@@ -255,19 +245,13 @@ class RollingChart(RelativeLayout):
         d5 = self._dp5
 
         if self._y_unit_str:
-            lbl = CoreLabel(text=self._y_unit_str, font_size=fs,
-                            color=[0.70, 0.70, 0.70, 1])
-            lbl.refresh()
-            tx = lbl.texture
+            tx = make_texture(self._y_unit_str, fs, _UNIT_LABEL_COLOR)
             self._yunit_rect.texture = tx
             self._yunit_rect.size    = tx.size
             self._yunit_rect.pos     = (wx + d4, wy + self._h - tx.height - d4)
 
         if self._x_unit_str:
-            lbl = CoreLabel(text=self._x_unit_str, font_size=fs,
-                            color=[0.70, 0.70, 0.70, 1])
-            lbl.refresh()
-            tx = lbl.texture
+            tx = make_texture(self._x_unit_str, fs, _UNIT_LABEL_COLOR)
             self._xunit_rect.texture = tx
             self._xunit_rect.size    = tx.size
             self._xunit_rect.pos     = (wx + self._w - tx.width - d4, wy + d5)

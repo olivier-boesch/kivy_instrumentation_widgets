@@ -1,11 +1,4 @@
-import ast
-if not hasattr(ast, 'Str'):
-    ast.Str = ast.Constant
-    ast.Num = ast.Constant
-    ast.Bytes = ast.Constant
-    ast.NameConstant = ast.Constant
-    ast.Constant.s = property(lambda self: self.value if isinstance(self.value, (str, bytes)) else '')
-    ast.Constant.n = property(lambda self: self.value if isinstance(self.value, (int, float, complex)) else 0)
+import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 __all__ = ['FlatButton', 'FlatToggleButton']
 
@@ -15,14 +8,16 @@ from kivy.properties import ListProperty, NumericProperty
 from kivy.graphics import Color, Line, RoundedRectangle
 from kivy.metrics import dp
 
+from theme import ACCENT, WHITE
+
 
 class _FlatBase(Label):
-    button_color = ListProperty([0.2, 0.6, 0.8, 1])
+    button_color = ListProperty(ACCENT)
     radius       = NumericProperty(8)
     border_width = NumericProperty(1.5)
 
     def __init__(self, **kwargs):
-        kwargs.setdefault('color',  [1, 1, 1, 1])
+        kwargs.setdefault('color',  WHITE)
         kwargs.setdefault('halign', 'center')
         kwargs.setdefault('valign', 'middle')
         super().__init__(**kwargs)

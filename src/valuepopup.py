@@ -1,4 +1,3 @@
-import pint
 from kivy.app import App
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
@@ -8,11 +7,12 @@ from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.clock import Clock
 
-ureg = pint.UnitRegistry()
+from units import ureg
 
 kv = '''
 #:import FlatButton flatbutton
 #:import FlatToggleButton flatbutton
+#:import theme theme
 <UnitNumberPopup>:
     title: self.title
     size_hint: 0.7, 0.7
@@ -33,12 +33,12 @@ kv = '''
             size_hint_y: 0.15
             canvas.before:
                 Color:
-                    rgba: 0.2,0.6,0.8,0.3
+                    rgba: theme.ACCENT_DIM
                 Rectangle:
                     pos: self.pos
                     size: self.size
                 Color:
-                    rgba: 0.2,0.6,0.8,1
+                    rgba: theme.ACCENT
                 Line:
                     rectangle: self.x, self.y, self.width, self.height
                     width: dp(1.5)

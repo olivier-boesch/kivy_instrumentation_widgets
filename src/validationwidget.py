@@ -6,6 +6,7 @@ from kivy.animation import Animation
 from kivy.metrics import dp
 
 kv = '''
+#:import theme theme
 <ValidationWidget>:
     orientation: 'horizontal'
     padding: dp(10)
@@ -47,7 +48,7 @@ kv = '''
         text: root.text
         pos: root.x + root.progress * (root.width - root.thumb_width), root.y
         size: root.thumb_width, root.height
-        color: 1, 1, 1, 1
+        color: theme.WHITE
         bold: True
         font_size: root.height * 0.3
 

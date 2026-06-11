@@ -1,19 +1,14 @@
-import ast
-if not hasattr(ast, 'Str'):
-    ast.Str = ast.Constant
-    ast.Num = ast.Constant
-    ast.Bytes = ast.Constant
-    ast.NameConstant = ast.Constant
-    ast.Constant.s = property(lambda self: self.value if isinstance(self.value, (str, bytes)) else '')
-    ast.Constant.n = property(lambda self: self.value if isinstance(self.value, (int, float, complex)) else 0)
+import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 __all__ = ['BorderWrapper']
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty
 from kivy.graphics import Color, Line, Rectangle, StencilPush, StencilPop, StencilUse, StencilUnUse
-from kivy.core.text import Label as CoreLabel
 from kivy.metrics import dp
+
+from theme import ACCENT_DIM, WHITE
+from _canvas_utils import make_texture
 
 
 class BorderWrapper(BoxLayout):
@@ -28,8 +23,8 @@ class BorderWrapper(BoxLayout):
     """
 
     title        = StringProperty("")
-    title_color  = ListProperty([1, 1, 1, 1])
-    border_color = ListProperty([0.2, 0.6, 0.8, 0.3])
+    title_color  = ListProperty(WHITE)
+    border_color = ListProperty(ACCENT_DIM)
     border_width = NumericProperty(1.5)
     radius       = NumericProperty(8)
     title_texture = ObjectProperty(None, allownone=True)
@@ -103,12 +98,9 @@ class BorderWrapper(BoxLayout):
 
     def _update_texture(self, *_):
         if self.title:
-            lbl = CoreLabel(
-                text=self.title, font_size=self.padding[1], bold=True,
-                color=self.title_color, halign='center',
-                padding=[self._dp10, 0, self._dp10, 0],
+            self.title_texture = make_texture(
+                self.title, self.padding[1], self.title_color, bold=True,
+                halign='center', padding=[self._dp10, 0, self._dp10, 0],
             )
-            lbl.refresh()
-            self.title_texture = lbl.texture
         else:
             self.title_texture = None

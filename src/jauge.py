@@ -1,16 +1,8 @@
-import ast
-if not hasattr(ast, 'Str'):
-    ast.Str = ast.Constant
-    ast.Num = ast.Constant
-    ast.Bytes = ast.Constant
-    ast.NameConstant = ast.Constant
-    ast.Constant.s = property(lambda self: self.value if isinstance(self.value, (str, bytes)) else '')
-    ast.Constant.n = property(lambda self: self.value if isinstance(self.value, (int, float, complex)) else 0)
+import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 import collections
 import math
 
-import pint
 from kivy.lang import Builder
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.properties import NumericProperty, StringProperty, ObjectProperty
@@ -18,14 +10,16 @@ from kivy.metrics import dp
 from kivy.animation import Animation
 from kivy.graphics import Color, Line, Triangle
 
-__all__ = ['CircularGauge']
+from units import ureg
+from theme import ACCENT, ACCENT_DIM, WHITE
 
-ureg = pint.UnitRegistry()
+__all__ = ['CircularGauge']
 
 _HALF_PI        = math.pi / 2
 _BASE_ANGLE_RAD = math.radians(4)   # demi-angle de la base du triangle, précalculé
 
 Builder.load_string('''
+#:import theme theme
 <CircularGauge>:
     BoxLayout:
         orientation: 'vertical'
@@ -38,7 +32,7 @@ Builder.load_string('''
             text: root.value_text
             font_size: min(root.size) * 0.15
             bold: True
-            color: 1, 1, 1, 1
+            color: theme.WHITE
             size_hint: 1, None
             height: self.texture_size[1]
             halign: 'center'
@@ -46,7 +40,7 @@ Builder.load_string('''
         Label:
             text: root.unit_text
             font_size: min(root.size) * 0.1
-            color: 1, 1, 1, 1
+            color: theme.WHITE
             size_hint: 1, None
             height: self.texture_size[1]
             halign: 'center'
@@ -54,7 +48,7 @@ Builder.load_string('''
         Label:
             text: root.mean_text
             font_size: min(root.size) * 0.05
-            color: 0.2, 0.6, 0.8, 1
+            color: theme.ACCENT
             size_hint: 1, None
             height: self.texture_size[1] + dp(5)
             halign: 'center'
@@ -62,7 +56,7 @@ Builder.load_string('''
         Label:
             text: "window: " + str(root.window_size_n)
             font_size: min(root.size) * 0.05
-            color: 0.2, 0.6, 0.8, 1
+            color: theme.ACCENT
             size_hint: 1, None
             height: self.texture_size[1] + dp(5)
             halign: 'center'
@@ -135,12 +129,12 @@ class CircularGauge(RelativeLayout):
 
         # Instructions canvas créées une fois, mises à jour in-place ensuite
         with self.canvas.before:
-            Color(0.2, 0.6, 0.8, 0.3)
+            Color(*ACCENT_DIM)
             self._bg_arc = Line(width=dp(8), cap='none')
-            Color(0.2, 0.6, 0.8, 1)
+            Color(*ACCENT)
             self._fg_arc = Line(width=dp(8), cap='none')
         with self.canvas:
-            Color(1, 1, 1, 1)
+            Color(*WHITE)
             self._triangle_instr = Triangle(points=[0, 0, 0, 0, 0, 0])
 
         self.bind(pos=self._rebuild_geometry, size=self._rebuild_geometry)
@@ -151,7 +145,7 @@ class CircularGauge(RelativeLayout):
 
     def set_value(self, value):
         if not isinstance(value, ureg.Quantity):
-            value = float(value) * ureg.meter
+            value = float(value) * self.min_value.units
 
         if value < self.min_value:
             value = self.min_value

@@ -9,18 +9,19 @@ from datetime import timedelta
 
 # Définition de l'interface graphique du widget
 KV = '''
+#:import theme theme
 <CircularTimer>:
     canvas.before:
         # Cercle d'arrière-plan (décor)
         Color:
-            rgba: 0.2, 0.6, 0.8, 0.3
+            rgba: theme.ACCENT_DIM
         Line:
             circle: (self.width / 2, self.height / 2, min(self.width, self.height) / 2 - dp(15), 0, 360)
             width: dp(8)
-            
+
         # Cercle de progression dynamique (bleu)
         Color:
-            rgba: (0.2, 0.6, 0.8, 1) if root.angle > 0 else (0, 0, 0, 0)
+            rgba: theme.ACCENT if root.angle > 0 else (0, 0, 0, 0)
         Line:
             circle: (self.width / 2, self.height / 2, min(self.width, self.height) / 2 - dp(15), 0, root.angle)
             width: dp(8)

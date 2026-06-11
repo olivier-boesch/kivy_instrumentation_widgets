@@ -1,15 +1,7 @@
-import ast
-if not hasattr(ast, 'Str'):
-    ast.Str = ast.Constant
-    ast.Num = ast.Constant
-    ast.Bytes = ast.Constant
-    ast.NameConstant = ast.Constant
-    ast.Constant.s = property(lambda self: self.value if isinstance(self.value, (str, bytes)) else '')
-    ast.Constant.n = property(lambda self: self.value if isinstance(self.value, (int, float, complex)) else 0)
+import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 import math
 import time
-import pint
 
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
@@ -19,18 +11,18 @@ from kivy.metrics import dp
 from kivy.graphics import Color, Line, PushMatrix, PopMatrix, Rotate, InstructionGroup
 from kivy.uix.accordion import Animation
 
+from units import ureg
+from theme import ACCENT, WHITE
 
-
-__all__ = ['RotaryEncoderWidget', 'BorderWrapper']
-
-ureg = pint.UnitRegistry()
+__all__ = ['RotaryEncoderWidget']
 
 _TICK_ANGLES_RAD = [math.radians(i * 22.5) for i in range(16)]
 
 Builder.load_string("""
+#:import theme theme
 <RotaryEncoderWidget>:
-    graphics_color: [0.2, 0.6, 0.8, 1]
-    text_color: [1, 1, 1, 1]
+    graphics_color: theme.ACCENT
+    text_color: theme.WHITE
 
     BoxLayout:
         orientation: 'vertical'
@@ -121,8 +113,8 @@ class RotaryEncoderWidget(Widget):
     quantity_name = StringProperty("")
     granularity   = NumericProperty(2)
 
-    graphics_color = ListProperty([0.2, 0.6, 0.8, 1])
-    text_color     = ListProperty([1, 1, 1, 1])
+    graphics_color = ListProperty(ACCENT)
+    text_color     = ListProperty(WHITE)
     fine_mode      = BooleanProperty(False)
 
     def __init__(self, **kwargs):
@@ -231,7 +223,7 @@ class RotaryEncoderWidget(Widget):
         if self._blink_event:
             self._blink_event.cancel()
             self._blink_event = None
-            self.text_color = [1, 1, 1, 1]
+            self.text_color = WHITE
 
     # ------------------------------------------------------------------
     # Touch
@@ -243,7 +235,7 @@ class RotaryEncoderWidget(Widget):
         Animation(rotation_angle=self._backup_rotation_angle, t='linear', d=0.2).start(self)
         self._updating = False
         self.state = 'idle'
-        self.text_color = [1, 1, 1, 1]
+        self.text_color = WHITE
         self.update_text()
         self._fine_acc = 0.0
         self._in_fine_mode = False
@@ -284,7 +276,7 @@ class RotaryEncoderWidget(Widget):
                 self.start_blinking()
             elif self.state == 'editing':
                 self.state = 'idle'
-                self.text_color = [1, 1, 1, 1]
+                self.text_color = WHITE
                 self.stop_blinking()
             return True
 
