@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install system dependencies (Kivy headless)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            libgl1 \
+            libgles2 \
+            libegl1 \
+            libmtdev1 \
+            libsdl2-2.0-0 \
+            libsdl2-image-2.0-0 \
+            libsdl2-mixer-2.0-0 \
+            libsdl2-ttf-2.0-0
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: xvfb-run --auto-servernum python -m pytest -v
