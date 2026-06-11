@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "performance: tests de performance (plus lents, exécutés avec le reste de la suite)",
+]
