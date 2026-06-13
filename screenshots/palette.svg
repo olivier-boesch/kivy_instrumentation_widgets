@@ -1,0 +1,24 @@
+<svg width="375" height="90" viewBox="0 0 375 90" xmlns="http://www.w3.org/2000/svg" style="background:#000; display:block;">
+  <rect width="375" height="90" fill="#000000FF" />
+
+  <rect x="10" y="10" width="40" height="40" fill="#000000FF" stroke="#FFFFFF55" />
+  <text x="30" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">BLACK</text>
+
+  <rect x="55" y="10" width="40" height="40" fill="#FFFFFFFF" />
+  <text x="75" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">WHITE</text>
+
+  <rect x="100" y="10" width="40" height="40" fill="#FFFFFF4D" />
+  <text x="120" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">WHITE_DIM</text>
+
+  <rect x="145" y="10" width="40" height="40" fill="#336699FF" />
+  <text x="165" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">ACCENT</text>
+
+  <rect x="190" y="10" width="40" height="40" fill="#3366994D" />
+  <text x="210" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">ACCENT_DIM</text>
+
+  <rect x="235" y="10" width="40" height="40" fill="#FF8000FF" />
+  <text x="255" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">EDIT</text>
+
+  <rect x="280" y="10" width="40" height="40" fill="#FF80004D" />
+  <text x="300" y="65" fill="#FFFFFFFF" font-size="9" font-family="monospace" text-anchor="middle">EDIT_DIM</text>
+</svg>

@@ -8,17 +8,15 @@ Axés sur un fond et les couleurs classiques de kivy. le design est flat pour ê
 
 * Fond : noir ( `#000000FF` )
 * Texte : blanc ( `#FFFFFFFF` )
+* Texte atténué (info secondaire) : blanc avec un alpha plus faible de 0.3 ( `#FFFFFF4D` )
 * Éléments graphiques interactif : Bleu kivy ( `[0.2, 0.6, 0.8, 1]` ou `#336699FF`)
-* Élémensts graphiques de décor : Bleu kivy avec un alpha plus faible de 0.3 ( `[0.2, 0.6, 0.8, 0.3]` ou `#33669955`)
+* Élémensts graphiques de décor : Bleu kivy avec un alpha plus faible de 0.3 ( `[0.2, 0.6, 0.8, 0.3]` ou `#3366994D`)
+* Édition / focus : Orange ( `[1, 0.5, 0, 1]` ou `#FF8000FF` )
+* Édition / focus atténué : Orange avec un alpha plus faible de 0.3 ( `[1, 0.5, 0, 0.3]` ou `#FF80004D` )
 
 Palette de couleurs :
 
-<svg width="195" height="60" viewBox="0 0 185 60" xmlns="http://www.w3.org/2000/svg" style="background:#000; display:block;">
-  <rect x="10" y="10" width="40" height="40" fill="#000000FF" />
-  <rect x="55" y="10" width="40" height="40" fill="#FFFFFFFF" />
-  <rect x="100" y="10" width="40" height="40" fill="#336699FF" />
-  <rect x="145" y="10" width="40" height="40" fill="#33669955" />
-</svg>
+![Palette de couleurs](screenshots/palette.svg)
 
 ## Composants principaux
 
@@ -38,6 +36,8 @@ Palette de couleurs :
   - Popup numérique avec sélection de préfixes SI et d'unités compatibles via Pint.
 - **`RotaryEncoderWidget`** (`src/encoder.py`)
   - Encodeur rotatif interactif pour l'ajustement fin de valeurs et l'affichage d'une unité.
+- **`SliderWidget`** (`src/sliderwidget.py`)
+  - Slider horizontal personnalisé avec label de valeur cliquable (à connecter à `UnitNumberPopup`) et réglage au clavier.
 
 ## Dependencies
 
@@ -59,6 +59,7 @@ Chaque module principal peut être démarré directement pour visualiser son app
 .venv/bin/python src/validationwidget.py
 .venv/bin/python src/valuepopup.py
 .venv/bin/python src/encoder.py
+.venv/bin/python src/sliderwidget.py
 ```
 
 ## Captures d'écran
@@ -72,6 +73,7 @@ Les captures d'écran de démonstration sont générées dans le dossier `screen
 - `screenshots/validationwidget.png`
 - `screenshots/valuepopup.png`
 - `screenshots/encoder.png`
+- `screenshots/sliderwidget.png`
 
 ![FlatButton](screenshots/flatbutton.png)
 ![Jauge circulaire](screenshots/jauge.png)
@@ -80,6 +82,7 @@ Les captures d'écran de démonstration sont générées dans le dossier `screen
 ![ValidationWidget](screenshots/validationwidget.png)
 ![ValuePopup](screenshots/valuepopup.png)
 ![RotaryEncoder](screenshots/encoder.png)
+![SliderWidget](screenshots/sliderwidget.png)
 
 ## Génération des captures d'écran
 
