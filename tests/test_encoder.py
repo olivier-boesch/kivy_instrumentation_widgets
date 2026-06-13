@@ -3,6 +3,7 @@ import time
 import pytest
 
 from encoder import RotaryEncoderWidget
+from theme import EDIT, TEXT
 from units import ureg
 
 
@@ -55,6 +56,18 @@ def test_double_tap_toggles_editing_mode():
     assert enc.state == 'idle'
 
 
+def test_editing_mode_recolors_ring_with_edit_color():
+    enc = make_encoder()
+
+    enc.on_touch_down(FakeTouch(175, 100, is_double_tap=True))
+    assert enc._color_instr.rgba == EDIT
+    assert enc.text_color == EDIT
+
+    enc.on_touch_down(FakeTouch(175, 100, is_double_tap=True))
+    assert enc._color_instr.rgba == list(enc.graphics_color)
+    assert enc.text_color == list(TEXT)
+
+
 def test_drag_outside_fine_zone_changes_value():
     enc = make_encoder()
     enc.on_touch_down(FakeTouch(175, 100, is_double_tap=True))  # éditer
@@ -68,11 +81,12 @@ def test_drag_outside_fine_zone_changes_value():
     touch.x, touch.y, touch.pos = 175, 100, (175, 100)
     enc.on_touch_move(touch)
 
-    assert enc.value.magnitude == pytest.approx(enc.step_max * 90, rel=1e-2)
+    step_max = enc._step() * enc.step_max_multiplier
+    assert enc.value.magnitude == pytest.approx(step_max * 90, rel=1e-2)
 
 
 def test_scroll_in_editing_mode_steps_value():
-    enc = make_encoder(step_min=0.5)
+    enc = make_encoder(granularity=0.5)
     enc.on_touch_down(FakeTouch(175, 100, is_double_tap=True))  # éditer
 
     enc.on_touch_down(FakeTouch(175, 100, button='scrollup'))

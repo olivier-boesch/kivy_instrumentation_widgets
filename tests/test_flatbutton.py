@@ -4,12 +4,13 @@ import pytest
 from kivy.metrics import dp
 
 from flatbutton import FlatButton, FlatToggleButton
-from theme import ACCENT
+from theme import ACCENT, ACCENT_DIM
 
 
-def test_default_button_color_is_accent():
+def test_default_colors_are_accent():
     btn = FlatButton(text="Valider")
-    assert btn.button_color == ACCENT
+    assert btn.button_color == ACCENT_DIM
+    assert btn.border_color == ACCENT
 
 
 def test_state_change_updates_fill_alpha():
@@ -19,17 +20,17 @@ def test_state_change_updates_fill_alpha():
     assert btn._fill_color.a == pytest.approx(1.0)
 
     btn.state = "normal"
-    assert btn._fill_color.a == pytest.approx(0.15)
+    assert btn._fill_color.a == pytest.approx(0.3)
 
 
 def test_button_color_updates_canvas_colors():
-    btn = FlatButton(text="Valider", button_color=[1, 0, 0, 1])
+    btn = FlatButton(text="Valider", button_color=[1, 0, 0, 1], border_color=[0, 0, 1, 1])
     assert list(btn._fill_color.rgb) == pytest.approx([1, 0, 0])
-    assert list(btn._border_color_instr.rgb) == pytest.approx([1, 0, 0])
+    assert list(btn._border_color_instr.rgb) == pytest.approx([0, 0, 1])
 
     btn.button_color = [0, 1, 0, 1]
     assert list(btn._fill_color.rgb) == pytest.approx([0, 1, 0])
-    assert list(btn._border_color_instr.rgb) == pytest.approx([0, 1, 0])
+    assert list(btn._border_color_instr.rgb) == pytest.approx([0, 0, 1])
 
 
 def test_radius_change_updates_geometry():
