@@ -8,24 +8,24 @@ from kivy.properties import ListProperty, NumericProperty
 from kivy.graphics import Color, Line, RoundedRectangle
 from kivy.metrics import dp
 
-from theme import ACCENT, WHITE
+from theme import ACCENT, ACCENT_DIM, TEXT, EDIT, EDIT_DIM, BACKGROUND, set_theme, LIGHT
 
 
 class _FlatBase(Label):
-    button_color = ListProperty(ACCENT)
+    button_color = ListProperty(ACCENT_DIM)
+    border_color = ListProperty(ACCENT)
     radius       = NumericProperty(8)
     border_width = NumericProperty(1.5)
 
     def __init__(self, **kwargs):
-        kwargs.setdefault('color',  WHITE)
+        kwargs.setdefault('color',  TEXT)
         kwargs.setdefault('halign', 'center')
         kwargs.setdefault('valign', 'middle')
         super().__init__(**kwargs)
-        bc = self.button_color
         with self.canvas.before:
-            self._fill_color         = Color(bc[0], bc[1], bc[2], 0.3)
+            self._fill_color         = Color(*self.button_color)
             self._fill_rect          = RoundedRectangle(pos=self.pos, size=self.size)
-            self._border_color_instr = Color(*bc)
+            self._border_color_instr = Color(*self.border_color)
             self._border_line        = Line(width=dp(self.border_width))
         self._dp_r = dp(self.radius)
         self.bind(
@@ -52,12 +52,12 @@ class _FlatBase(Label):
         self._border_line.rounded_rectangle = (*self.pos, *self.size, self._dp_r)
 
     def _on_state(self, *_):
-        self._fill_color.a = 1.0 if self.state == 'down' else 0.15
+        self._fill_color.rgba = self.button_color if self.state == 'normal' else self.border_color
 
     def _on_button_color(self, *_):
         bc = self.button_color
-        self._fill_color.rgb         = bc[:3]
-        self._border_color_instr.rgb = bc[:3]
+        self._fill_color.rgba         = self.button_color
+        self._border_color_instr.rgba = self.border_color
 
 
 class FlatButton(ButtonBehavior, _FlatBase):
@@ -79,7 +79,7 @@ if __name__ == '__main__':
             row1 = BoxLayout(size_hint_y=None, height=dp(50), spacing=dp(15))
             row1.add_widget(FlatButton(text="Valider"))
             row1.add_widget(FlatButton(text="Annuler"))
-            row1.add_widget(FlatButton(text="Paramètres", button_color=[0.5, 0.5, 0.5, 1]))
+            row1.add_widget(FlatButton(text="Paramètres", button_color=EDIT_DIM, border_color=EDIT))
             root.add_widget(row1)
 
             row2 = BoxLayout(size_hint_y=None, height=dp(50), spacing=dp(15))

@@ -7,7 +7,7 @@ from kivy.properties import StringProperty, ListProperty, NumericProperty, Objec
 from kivy.graphics import Color, Line, Rectangle, StencilPush, StencilPop, StencilUse, StencilUnUse
 from kivy.metrics import dp
 
-from theme import ACCENT_DIM, WHITE
+from theme import ACCENT_DIM, TEXT
 from _canvas_utils import make_texture
 
 
@@ -23,7 +23,7 @@ class BorderWrapper(BoxLayout):
     """
 
     title        = StringProperty("")
-    title_color  = ListProperty(WHITE)
+    title_color  = ListProperty(TEXT)
     border_color = ListProperty(ACCENT_DIM)
     border_width = NumericProperty(1.5)
     radius       = NumericProperty(8)
@@ -46,7 +46,7 @@ class BorderWrapper(BoxLayout):
             StencilPop()
 
         with self.canvas.after:
-            self._title_color_instr = Color(1, 1, 1, 0)
+            self._title_color_instr = Color(*TEXT[:3], 0)
             self._title_rect = Rectangle()
 
         self.bind(
@@ -85,7 +85,7 @@ class BorderWrapper(BoxLayout):
             self._smask_right.pos = (x + r + tw + d20, title_y)
             self._smask_right.size = (self.right - (x + r + tw + d20), th)
 
-            self._title_color_instr.rgba = [1, 1, 1, 1]
+            self._title_color_instr.rgba = TEXT
             self._title_rect.texture = tt
             self._title_rect.pos  = (x + r + d10, title_y)
             self._title_rect.size = tt.size

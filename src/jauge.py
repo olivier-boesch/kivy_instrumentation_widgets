@@ -11,7 +11,7 @@ from kivy.animation import Animation
 from kivy.graphics import Color, Line, Triangle
 
 from units import ureg
-from theme import ACCENT, ACCENT_DIM, WHITE
+from theme import ACCENT, ACCENT_DIM, TEXT
 
 __all__ = ['CircularGauge']
 
@@ -32,7 +32,7 @@ Builder.load_string('''
             text: root.value_text
             font_size: min(root.size) * 0.15
             bold: True
-            color: theme.WHITE
+            color: theme.TEXT
             size_hint: 1, None
             height: self.texture_size[1]
             halign: 'center'
@@ -40,7 +40,7 @@ Builder.load_string('''
         Label:
             text: root.unit_text
             font_size: min(root.size) * 0.1
-            color: theme.WHITE
+            color: theme.TEXT
             size_hint: 1, None
             height: self.texture_size[1]
             halign: 'center'
@@ -134,7 +134,7 @@ class CircularGauge(RelativeLayout):
             Color(*ACCENT)
             self._fg_arc = Line(width=dp(8), cap='none')
         with self.canvas:
-            Color(*WHITE)
+            Color(*TEXT)
             self._triangle_instr = Triangle(points=[0, 0, 0, 0, 0, 0])
 
         self.bind(pos=self._rebuild_geometry, size=self._rebuild_geometry)

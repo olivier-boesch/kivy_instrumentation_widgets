@@ -12,7 +12,8 @@ from kivy.graphics import Color, Line, PushMatrix, PopMatrix, Rotate, Instructio
 from kivy.uix.accordion import Animation
 
 from units import ureg
-from theme import ACCENT, WHITE
+from theme import ACCENT, ACCENT_DIM, TEXT, EDIT
+from granularity import snap_value, format_value
 
 __all__ = ['RotaryEncoderWidget']
 
@@ -22,7 +23,7 @@ Builder.load_string("""
 #:import theme theme
 <RotaryEncoderWidget>:
     graphics_color: theme.ACCENT
-    text_color: theme.WHITE
+    text_color: theme.TEXT
 
     BoxLayout:
         orientation: 'vertical'
@@ -62,7 +63,7 @@ Builder.load_string("""
 
     Label:
         text: 'fin' if root.fine_mode else ''
-        color: 1, 1, 1, 0.3
+        color: theme.EDIT
         font_size: min(root.height, root.width) * 0.05
         size: min(root.height, root.width) * 0.2, min(root.height, root.width) * 0.1
         center_x: root.center_x + min(root.height, root.width) * 0.25
@@ -81,18 +82,22 @@ class RotaryEncoderWidget(Widget):
         max_value      (float) — valeur maximale
         unit           (str)   — unité Pint (ex. 'W', 'A', 'm/s')
         quantity_name  (str)   — libellé affiché au-dessus de la valeur
-        step_min       (float) — pas en mode fin (molette / zone centrale)
-        step_max       (float) — pas maximum en mode normal (haute vélocité)
-        fine_deg_per_step (float) — degrés de rotation par step_min en mode fin
-        granularity    (int)   — nombre de décimales affichées
+        granularity    (float) — pas de quantification de la valeur (voir
+                                  `granularity.py`) ; `None` désactive l'arrondi
+                                  (vaut alors 1) ; utilisé comme pas en mode
+                                  fin (molette / zone centrale)
+        step_max_multiplier (float) — multiplicateur de `granularity` donnant
+                                  le pas maximum en mode normal (haute vélocité)
+        fine_deg_per_step (float) — degrés de rotation par pas de granularity
+                                  en mode fin
         graphics_color (list)  — couleur RGBA du widget
         text_color     (list)  — couleur RGBA du texte
 
     Interactions :
         double-tap  — bascule en mode édition (clignotement orange)
         glisser     — modifie la valeur (vélocité angulaire → sensibilité)
-        zone centrale (50 % du rayon) — mode fin : 1 step_min par demi-tour
-        molette     — ±step_min en mode édition
+        zone centrale (50 % du rayon) — mode fin : 1 pas de granularity par demi-tour
+        molette     — ±granularity en mode édition
         appui long (1 s) — annule les modifications
     """
 
@@ -101,9 +106,8 @@ class RotaryEncoderWidget(Widget):
     value      = ObjectProperty(None)
     unit       = ObjectProperty(None)
 
-    step_min          = NumericProperty(0.01)
-    step_max          = NumericProperty(0.2)
-    fine_deg_per_step = NumericProperty(180.0)
+    step_max_multiplier = NumericProperty(20)
+    fine_deg_per_step   = NumericProperty(180.0)
 
     rotation_angle = NumericProperty(0)
     state          = StringProperty('idle')
@@ -111,10 +115,10 @@ class RotaryEncoderWidget(Widget):
     value_text    = StringProperty("")
     unit_text     = StringProperty("")
     quantity_name = StringProperty("")
-    granularity   = NumericProperty(2)
+    granularity   = NumericProperty(0.01, allownone=True)
 
     graphics_color = ListProperty(ACCENT)
-    text_color     = ListProperty(WHITE)
+    text_color     = ListProperty(TEXT)
     fine_mode      = BooleanProperty(False)
 
     def __init__(self, **kwargs):
@@ -166,13 +170,20 @@ class RotaryEncoderWidget(Widget):
             self._unit = ureg(self.unit)
         self.update_text()
 
+    def _step(self):
+        return self.granularity if self.granularity else 1
+
     # ------------------------------------------------------------------
     # Canvas
     # ------------------------------------------------------------------
 
     def _update_color(self, *_):
-        self._color_instr.rgba = self.graphics_color
+        if self.state != 'editing':
+            self._color_instr.rgba = self.graphics_color
         self._boundary_color.rgba = self.graphics_color[:3] + [ 0.3]
+
+    def _set_editing_visual(self, editing):
+        self._color_instr.rgba = EDIT if editing else self.graphics_color
 
     def _rebuild_geometry(self, *_):
         cx, cy = self.center_x, self.center_y
@@ -194,7 +205,7 @@ class RotaryEncoderWidget(Widget):
                 width=tick_w,
             ))
 
-        self._boundary_color.rgba = [0.2, 0.6, 0.8, 0.2]
+        self._boundary_color.rgba = ACCENT_DIM
         self._boundary_group.clear()
         self._boundary_group.add(Line(circle=(cx, cy, self._r_fine), width=dp(1.5)))
 
@@ -208,22 +219,22 @@ class RotaryEncoderWidget(Widget):
     def update_text(self, *_):
         if self._updating or self.value is None:
             return
-        self.value_text = f"{self.value.magnitude:.{self.granularity}f}"
+        self.value_text = format_value(self.value.magnitude, self.granularity)
         self.unit_text  = f"{self.value.units:~^P}"
 
     def _blink_text(self, *_):
-        self.text_color = [1, 1, 1, 0.3] if self.text_color == [1, 0.5, 0, 0.3] else [1, 0.5, 0, 0.3]
+        self.text_color = TEXT if self.text_color == EDIT else EDIT
 
     def start_blinking(self):
         if not self._blink_event:
             self._blink_event = Clock.schedule_interval(self._blink_text, 0.5)
-            self.text_color = [1, 0.5, 0, 0.3]
+            self.text_color = EDIT
 
     def stop_blinking(self):
         if self._blink_event:
             self._blink_event.cancel()
             self._blink_event = None
-            self.text_color = WHITE
+            self.text_color = TEXT
 
     # ------------------------------------------------------------------
     # Touch
@@ -235,7 +246,8 @@ class RotaryEncoderWidget(Widget):
         Animation(rotation_angle=self._backup_rotation_angle, t='linear', d=0.2).start(self)
         self._updating = False
         self.state = 'idle'
-        self.text_color = WHITE
+        self.text_color = TEXT
+        self._set_editing_visual(False)
         self.update_text()
         self._fine_acc = 0.0
         self._in_fine_mode = False
@@ -256,8 +268,8 @@ class RotaryEncoderWidget(Widget):
         if hasattr(touch, 'button') and touch.button in ('scrollup', 'scrolldown'):
             if self.state == 'editing':
                 direction = 1 if touch.button == 'scrollup' else -1
-                new_magnitude = round(
-                    max(self.min_value, min(self.max_value, self.value.magnitude + direction * self.step_min)),
+                new_magnitude = snap_value(
+                    max(self.min_value, min(self.max_value, self.value.magnitude + direction * self._step())),
                     self.granularity,
                 )
                 self.value = new_magnitude * self._unit
@@ -272,11 +284,13 @@ class RotaryEncoderWidget(Widget):
                 self.state = 'editing'
                 self._backup_value = self.value
                 self._backup_rotation_angle = self.rotation_angle
-                self.text_color = [1, 0.5, 0, 1]
+                self.text_color = EDIT
+                self._set_editing_visual(True)
                 self.start_blinking()
             elif self.state == 'editing':
                 self.state = 'idle'
-                self.text_color = WHITE
+                self.text_color = TEXT
+                self._set_editing_visual(False)
                 self.stop_blinking()
             return True
 
@@ -317,15 +331,17 @@ class RotaryEncoderWidget(Widget):
                 self._fine_acc -= delta_angle
                 steps = int(self._fine_acc / self.fine_deg_per_step)
                 self._fine_acc -= steps * self.fine_deg_per_step
-                change = steps * self.step_min
+                change = steps * self._step()
             else:
+                step = self._step()
+                step_max = step * self.step_max_multiplier
                 angular_velocity = abs(delta_angle) / delta_time
-                sensitivity = self.step_min + (self.step_max - self.step_min) * min(angular_velocity / 1000.0, 1.0)
+                sensitivity = step + (step_max - step) * min(angular_velocity / 1000.0, 1.0)
                 change = -delta_angle * sensitivity
 
             if change:
                 self._updating = True
-                new_magnitude = round(
+                new_magnitude = snap_value(
                     max(self.min_value, min(self.max_value, self.value.magnitude + change)),
                     self.granularity,
                 )
@@ -373,15 +389,14 @@ BoxLayout:
             RotaryEncoderWidget:
                 min_value: 0
                 max_value: 100
-                step_min: 0.01
-                step_max: 0.3
+                granularity: 0.01
+                step_max_multiplier: 30
                 unit: 'W'
                 quantity_name: "Puissance"
             RotaryEncoderWidget:
                 min_value: 0
                 max_value: 100
-                step_min: 0.01
-                step_max: 0.2
+                granularity: 0.01
                 unit: 'A'
                 quantity_name: "Courant"
 """

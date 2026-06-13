@@ -21,7 +21,7 @@ KV = '''
 
         # Cercle de progression dynamique (bleu)
         Color:
-            rgba: theme.ACCENT if root.angle > 0 else (0, 0, 0, 0)
+            rgba: theme.ACCENT if root.angle > 0 else (*theme.BACKGROUND[:3], 0)
         Line:
             circle: (self.width / 2, self.height / 2, min(self.width, self.height) / 2 - dp(15), 0, root.angle)
             width: dp(8)

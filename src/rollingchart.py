@@ -10,14 +10,14 @@ from kivy.graphics import Color, Line, Rectangle
 from kivy.metrics import dp
 
 from units import ureg
-from theme import ACCENT, WHITE, BLACK
+from theme import ACCENT, ACCENT_DIM, TEXT, TEXT_DIM, BACKGROUND
 from _canvas_utils import make_texture
 
 _N_Y_TICKS = 5
 _N_X_TICKS = 3
 
-_TICK_LABEL_COLOR = [0.80, 0.80, 0.80, 1]
-_UNIT_LABEL_COLOR = [0.70, 0.70, 0.70, 1]
+_TICK_LABEL_COLOR = TEXT_DIM
+_UNIT_LABEL_COLOR = TEXT_DIM
 
 
 class RollingChart(RelativeLayout):
@@ -78,13 +78,13 @@ class RollingChart(RelativeLayout):
         self._pts = [0.0] * (2 * x_window)
 
         with self.canvas.before:
-            Color(*BLACK)
+            Color(*BACKGROUND)
             self._bg = Rectangle()
-            Color(*ACCENT)
+            Color(*ACCENT_DIM)
             self._grid_lines = []
             for _ in range(_N_Y_TICKS):
                 self._grid_lines.append(Line())
-            Color(*ACCENT)
+            Color(*ACCENT_DIM)
             self._axes = Line()
 
         with self.canvas:
@@ -96,17 +96,17 @@ class RollingChart(RelativeLayout):
             # par le CoreLabel uniquement (sinon double atténuation)
             self._ytick_rects = []
             for _ in range(_N_Y_TICKS):
-                Color(*WHITE)
+                Color(*TEXT)
                 self._ytick_rects.append(Rectangle(size=(0, 0)))
 
             self._xtick_rects = []
             for _ in range(_N_X_TICKS):
-                Color(*WHITE)
+                Color(*TEXT)
                 self._xtick_rects.append(Rectangle(size=(0, 0)))
 
-            Color(*WHITE)
+            Color(*TEXT)
             self._yunit_rect = Rectangle(size=(0, 0))
-            Color(*WHITE)
+            Color(*TEXT)
             self._xunit_rect = Rectangle(size=(0, 0))
 
         self.bind(

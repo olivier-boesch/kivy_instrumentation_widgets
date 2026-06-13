@@ -31,14 +31,14 @@ kv = '''
     thumb_width: '120dp'
     canvas.before:
         Color:
-            rgba: (0.2, 0.6, 0.8, (1-self.progress/0.9)*0.3) if self.progress < 0.90 else (0.0, 0.0, 0.0, 1)
+            rgba: (*theme.ACCENT[:3], (1-self.progress/0.9)*0.3) if self.progress < 0.90 else theme.BACKGROUND
         RoundedRectangle:
             pos: self.pos
             size: self.size
             radius: [dp(8)]
     canvas:
         Color:
-            rgba: (0.2, 0.6, 0.8, 1) if self.progress < 0.90 else (0.0, 0.0, 0.0, 0)
+            rgba: theme.ACCENT if self.progress < 0.90 else (*theme.BACKGROUND[:3], 0)
         RoundedRectangle:
             pos: self.x + self.progress * (self.width - self.thumb_width), self.y
             size: self.thumb_width, self.height
@@ -48,29 +48,29 @@ kv = '''
         text: root.text
         pos: root.x + root.progress * (root.width - root.thumb_width), root.y
         size: root.thumb_width, root.height
-        color: theme.WHITE
+        color: theme.TEXT
         bold: True
         font_size: root.height * 0.3
 
 <ActionCircle>:
     canvas.before:
         Color:
-            rgba: (0.2, 0.6, 0.8, root.signal_alpha) if self.is_active else (0,0,0,0)
+            rgba: (*theme.ACCENT[:3], root.signal_alpha) if self.is_active else (*theme.BACKGROUND[:3], 0)
         Line:
             circle: (self.center_x, self.center_y, root.signal_radius)
             width: dp(2)
 
         Color:
-            rgba: (0.2, 0.6, 0.8, 1) if self.is_active else (0.2, 0.6, 0.8, 0.1)
+            rgba: theme.ACCENT if self.is_active else theme.ACCENT_DIM
         Ellipse:
             pos: self.center_x - min(self.width, self.height)*0.5, self.center_y - min(self.width, self.height) * 0.5
             size: min(self.width, self.height), min(self.width, self.height)
-        
+
 
     Label:
         text: root.text
         center: root.center
-        color: (1, 1, 1, 1) if root.is_active else (1, 1, 1, 0.2)
+        color: theme.TEXT if root.is_active else theme.TEXT_DIM
         bold: True
         font_size: root.height * 0.3
 '''
