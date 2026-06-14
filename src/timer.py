@@ -33,7 +33,11 @@ KV = '''
         font_name: 'Roboto'
         bold: True
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        color: theme.TEXT
 '''
+
+Builder.load_string(KV)
+
 
 class CircularTimer(RelativeLayout):
     angle = NumericProperty(360)
@@ -96,7 +100,6 @@ class CircularTimer(RelativeLayout):
 
 class TestApp(App):
     def build(self):
-        Builder.load_string(KV)
         root = BoxLayout(orientation='vertical', padding=20, spacing=20)
 
         # Instance du widget personnalisé
