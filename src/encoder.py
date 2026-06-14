@@ -195,7 +195,7 @@ class RotaryEncoderWidget(Widget):
             return
         self._r_fine  = self._r_outer * 0.5
         r_inner = self._r_outer - dp(15)
-        tick_w  = dp(4)
+        tick_w  = dp(1.5)
 
         self._rotate_instr.origin = (cx, cy)
         self._geom_group.clear()
