@@ -47,9 +47,23 @@ Palette de couleurs :
 
 Le dépôt contient également un sous-dossier `pint-master/` pour la gestion locale de la dépendance Pint.
 
-## Exemples de démo
+## Application de démo
 
-Chaque module principal peut être démarré directement pour visualiser son application de test :
+Le module `src/demo.py` rassemble tous les widgets du paquet dans un tableau
+de bord unique (jauge circulaire, graphique défilant, minuteur, encodeurs
+rotatifs, sliders, validation par glissement, boutons plats et popup
+numérique) :
+
+```bash
+.venv/bin/python src/demo.py
+```
+
+![Démo complète](screenshots/demo.png)
+
+## Exemples de démo par widget
+
+Chaque module principal peut également être démarré directement pour
+visualiser son application de test isolée :
 
 ```bash
 .venv/bin/python src/flatbutton.py
@@ -66,6 +80,7 @@ Chaque module principal peut être démarré directement pour visualiser son app
 
 Les captures d'écran de démonstration sont générées dans le dossier `screenshots/` :
 
+- `screenshots/demo.png`
 - `screenshots/flatbutton.png`
 - `screenshots/jauge.png`
 - `screenshots/rollingchart.png`

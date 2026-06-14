@@ -16,8 +16,8 @@ from _canvas_utils import make_texture
 _N_Y_TICKS = 5
 _N_X_TICKS = 3
 
-_TICK_LABEL_COLOR = TEXT_DIM
-_UNIT_LABEL_COLOR = TEXT_DIM
+_TICK_LABEL_COLOR = TEXT
+_UNIT_LABEL_COLOR = TEXT
 
 
 class RollingChart(RelativeLayout):
