@@ -2,6 +2,7 @@ import _compat  # noqa: F401  (shim de compatibilité Python 3.14+)
 
 __all__ = ['BorderWrapper']
 
+from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, ListProperty, NumericProperty, ObjectProperty
 from kivy.graphics import Color, Line, Rectangle, StencilPush, StencilPop, StencilUse, StencilUnUse
@@ -54,19 +55,27 @@ class BorderWrapper(BoxLayout):
             title_color=self._update_texture,
             padding=self._update_texture,
             pos=self._rebuild_canvas,
-            size=self._rebuild_canvas,
+            size=self._delayed_rebuild_canvas,
             title_texture=self._rebuild_canvas,
             border_color=self._on_border_color,
             border_width=self._on_border_width,
             radius=self._rebuild_canvas,
         )
         self._update_texture()
+        # Le BoxLayout parent peut n'avoir pas encore atteint sa taille
+        # définitive lors des premiers appels (largeur encore par défaut) :
+        # un nouveau calcul après la mise en page initiale évite des masques
+        # de taille incorrecte (ex. titre traversé par la bordure).
+        Clock.schedule_once(self._rebuild_canvas, 0)
 
     def _on_border_color(self, *_):
         self._border_color_instr.rgba = self.border_color
 
     def _on_border_width(self, *_):
         self._border_line.width = dp(self.border_width)
+
+    def _delayed_rebuild_canvas(self, *_):
+        Clock.schedule_once(self._rebuild_canvas, 0)
 
     def _rebuild_canvas(self, *_):
         x, y, w, h = self.x, self.y, self.width, self.height
@@ -80,10 +89,10 @@ class BorderWrapper(BoxLayout):
             title_y  = self.top - th / 2
             d10, d20 = self._dp10, self._dp20
 
-            self._smask_bot.pos   = (x, y);             self._smask_bot.size  = (w, title_y - y)
-            self._smask_left.pos  = (x, title_y);       self._smask_left.size = (r + d10, th)
+            self._smask_bot.pos   = (x, y);             self._smask_bot.size  = (w, max(0, title_y - y))
+            self._smask_left.pos  = (x, title_y);       self._smask_left.size = (max(0, r + d10), th)
             self._smask_right.pos = (x + r + tw + d20, title_y)
-            self._smask_right.size = (self.right - (x + r + tw + d20), th)
+            self._smask_right.size = (max(0, self.right - (x + r + tw + d20)), th)
 
             self._title_color_instr.rgba = TEXT
             self._title_rect.texture = tt
