@@ -83,18 +83,21 @@ class RotaryEncoderWidget(Widget):
         unit           (str)   — unité Pint (ex. 'W', 'A', 'm/s')
         quantity_name  (str)   — libellé affiché au-dessus de la valeur
         granularity    (float) — pas de quantification de la valeur (voir
-                                  `granularity.py`) ; `None` désactive l'arrondi
-                                  (vaut alors 1) ; utilisé comme pas en mode
-                                  fin (molette / zone centrale)
+                                  `granularity.py`) ; sert aussi de pas pour
+                                  la molette et le mode fin ; `None` désactive
+                                  l'arrondi et vaut alors 1 comme pas
         step_max_multiplier (float) — multiplicateur de `granularity` donnant
                                   le pas maximum en mode normal (haute vélocité)
         fine_deg_per_step (float) — degrés de rotation par pas de granularity
                                   en mode fin
         graphics_color (list)  — couleur RGBA du widget
         text_color     (list)  — couleur RGBA du texte
+        fine_mode      (bool)  — True pendant un ajustement en mode fin
+                                  (zone centrale), affiche l'indicateur "fin"
 
     Interactions :
-        double-tap  — bascule en mode édition (clignotement orange)
+        double-tap  — bascule en mode édition (texte clignotant et anneau en
+                       couleur EDIT)
         glisser     — modifie la valeur (vélocité angulaire → sensibilité)
         zone centrale (50 % du rayon) — mode fin : 1 pas de granularity par demi-tour
         molette     — ±granularity en mode édition
@@ -107,7 +110,7 @@ class RotaryEncoderWidget(Widget):
     unit       = ObjectProperty(None)
 
     step_max_multiplier = NumericProperty(20)
-    fine_deg_per_step   = NumericProperty(180.0)
+    fine_deg_per_step   = NumericProperty(90.0)
 
     rotation_angle = NumericProperty(0)
     state          = StringProperty('idle')
@@ -399,6 +402,7 @@ BoxLayout:
                 granularity: 0.01
                 unit: 'A'
                 quantity_name: "Courant"
+                disabled: True
 """
 
     class RotaryEncoderApp(App):
